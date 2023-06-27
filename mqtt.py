@@ -2,6 +2,7 @@ import sys
 import time
 import random
 from Adafruit_IO import MQTTClient
+import requests
 
 
 
@@ -30,6 +31,20 @@ def message(client , feed_id , payload):
         global_equation = payload
         print(global_equation)
 
+
+def init_glogal_equation():
+    headers={}
+    aio_url="https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/equation"
+    x = requests.get(url=aio_url, headers=headers, verify=False)
+    data=x.json()
+    global_equation = data["last_value"]
+    print("Get lastest value:", global_equation)
+
+def modify_value(x1,x2,x3):
+    result = eval(global_equation)
+    print(result)
+    return result
+
 client = MQTTClient(AIO_USERNAME , AIO_KEY)
 
 
@@ -39,11 +54,17 @@ client.on_message = message
 client.on_subscribe = subscribe
 client.connect()
 client.loop_background()
+init_glogal_equation()
 
 
 while True:
-    #time.sleep(5)
-    #client.publish("sensor1", random.randint(0, 101))
-    #client.publish("sensor2", random.randint(0, 101))
-    #client.publish("sensor3", random.randint(0, 21))    
+    time.sleep(5)
+    s1=random.randint(0, 101)
+    s2=random.randint(0, 101)
+    s3=random.randint(0, 21)
+    client.publish("sensor1", s1)
+    client.publish("sensor2", s2)
+    client.publish("sensor3", s3)
+    E=modify_value(s1,s2,s3)
+    print(E)   
     pass
