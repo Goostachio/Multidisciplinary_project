@@ -11,7 +11,7 @@ AIO_USERNAME = "Multidisciplinary_Project"
 AIO_KEY = ""
 AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation"]
 
-global_equation=""
+global_equation="x1 + x2 + x3"
 
 def connected(client):
     print("Ket noi thanh cong ...")
