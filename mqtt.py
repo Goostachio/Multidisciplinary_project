@@ -8,7 +8,7 @@ import sensor
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = "aio_ZuDi12UG92fw3g55ZfkIoehdJlG2"
+AIO_KEY = ""
 AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation"]
 
 global_equation=""
