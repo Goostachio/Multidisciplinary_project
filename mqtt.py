@@ -3,15 +3,15 @@ import time
 import random
 from Adafruit_IO import MQTTClient
 import requests
-
+import sensor
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = ""
+AIO_KEY = "aio_ZuDi12UG92fw3g55ZfkIoehdJlG2"
 AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation"]
 
-global_equation="x1 + x2 + x3"
+global_equation=""
 
 def connected(client):
     print("Ket noi thanh cong ...")
@@ -27,9 +27,23 @@ def disconnected(client):
 
 def message(client , feed_id , payload):
     print("Nhan du lieu: " + payload)
+
     if(feed_id == "equation"):
         global_equation = payload
         print(global_equation)
+        return
+    
+    if (feed_id == "button1"):
+        if payload == "ON":
+            print("Bat den...")
+            sensor.sendCommand("2")
+            return
+        
+        if payload == "OFF":
+            print("Tat den...")
+            sensor.sendCommand("3")
+            return
+
 
 
 def init_glogal_equation():
@@ -45,6 +59,14 @@ def modify_value(x1,x2,x3):
     print(result)
     return result
 
+def request_Data(command):
+    sensor.sendCommand(command)
+    time.sleep(3)
+    return_Data = sensor.readSerial()
+    if return_Data ==[]:
+        return "0"
+    return return_Data[2]
+
 client = MQTTClient(AIO_USERNAME , AIO_KEY)
 
 
@@ -59,12 +81,12 @@ init_glogal_equation()
 
 while True:
     time.sleep(5)
-    s1=random.randint(0, 101)
-    s2=random.randint(0, 101)
-    s3=random.randint(0, 21)
+    s1=float(request_Data("0"))
+    s2=float(request_Data("1"))
+    s3=random.randint(0, 101)
     client.publish("sensor1", s1)
     client.publish("sensor2", s2)
     client.publish("sensor3", s3)
-    E=modify_value(s1,s2,s3)
-    print(E)   
+    client.publish("test feed", modify_value (s1,s2,s3))
+
     pass
