@@ -4,14 +4,18 @@ import random
 from Adafruit_IO import MQTTClient
 import requests
 import sensor
+import gps
+from math import radians, sin, cos, sqrt, atan2
 
 
-AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation"]
+AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation","location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = ""
-AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation"]
+AIO_KEY = "aio_WPoM34AcvOqmMFU4KyAvQLMJH9du"
+AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation","location"]
 
-global_equation=""
+global_equation="x1+x2+x3"
+
+
 
 def connected(client):
     print("Ket noi thanh cong ...")
@@ -43,7 +47,7 @@ def message(client , feed_id , payload):
             print("Tat den...")
             sensor.sendCommand("3")
             return
-
+    
 
 
 def init_glogal_equation():
@@ -59,13 +63,53 @@ def modify_value(x1,x2,x3):
     print(result)
     return result
 
-def request_Data(command):
-    sensor.sendCommand(command)
-    time.sleep(3)
-    return_Data = sensor.readSerial()
-    if return_Data ==[]:
-        return "0"
-    return return_Data[2]
+
+def publish_gps_to_adafruit_io(latitude, longitude):
+
+
+    aio_headers = {
+        'X-AIO-Key': AIO_KEY,
+        'Content-Type': 'application/json',
+    }
+    aio_url = f'https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/location/data'
+    aio_payload = {
+        'value': f'{latitude},{longitude}',
+    }
+    response = requests.post(aio_url, headers=aio_headers, json=aio_payload)
+    if response.status_code == 200:
+        print(f'Published GPS data: Latitude={latitude}, Longitude={longitude}')
+    else:
+        print(f'Failed to publish GPS data. Status code: {response.status_code}')
+
+
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    R = 6371.0  # Earth's radius in kilometers
+
+    lat1_rad = radians(lat1)
+    lon1_rad = radians(lon1)
+    lat2_rad = radians(lat2)
+    lon2_rad = radians(lon2)
+
+    d_lon = lon2_rad - lon1_rad
+    d_lat = lat2_rad - lat1_rad
+
+    a = sin(d_lat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(d_lon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+    return distance
+    
+
+
+def requestData(cmd): 
+    sensor.sendCommand(cmd) 
+    time.sleep(2)
+    temp_hum = sensor.readSerial()
+    
+    return temp_hum
+    
+    
 
 client = MQTTClient(AIO_USERNAME , AIO_KEY)
 
@@ -80,13 +124,30 @@ init_glogal_equation()
 
 
 while True:
-    time.sleep(5)
-    s1=float(request_Data("0"))
-    s2=float(request_Data("1"))
+
+    if sensor.USE_REAL_SENSOR_DATA:
+        s1 = requestData ("0")
+        s2 = requestData("1")
+        time.sleep(1)
+    else:
+
+        print("using simulated data")
+        s1, s2 = sensor.generateRandomTH()
+        time.sleep(1)
+
     s3=random.randint(0, 101)
     client.publish("sensor1", s1)
     client.publish("sensor2", s2)
     client.publish("sensor3", s3)
+    time.sleep(2)
     client.publish("test feed", modify_value (s1,s2,s3))
+    latitude, longitude = gps.read_gps_data()
+    print(f'Latitude: {latitude}, Longitude: {longitude}')
+
+
+    publish_gps_to_adafruit_io(latitude, longitude)
+
+
+    time.sleep(10)
 
     pass
