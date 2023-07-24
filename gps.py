@@ -21,12 +21,14 @@ def read_gps_data():
                 line = ser.readline().decode('utf-8').strip()
                 if line.startswith("Latitude= ") and line.count(" Longitude= ") == 1:
                     # Extract latitude and longitude values from the line
-                    _, latitude, longitude = line.split()
+                    _, lat_str, lon_str = line.split()
+                    latitude = float(lat_str)
+                    longitude = float(lon_str)
                     return latitude, longitude
     except serial.SerialException:
         # Serial port not accessible, generate random GPS coordinates instead
-        latitude = str(round(random.uniform(BEN_CAT_GPS_REGION['min_lat'], BEN_CAT_GPS_REGION['max_lat']), 6))
-        longitude = str(round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6))
+        latitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lat'], BEN_CAT_GPS_REGION['max_lat']), 6)
+        longitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6)
         return latitude, longitude
 
 #mqtt

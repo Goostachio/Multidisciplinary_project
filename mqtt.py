@@ -10,11 +10,11 @@ from math import radians, sin, cos, sqrt, atan2
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation","location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = "aio_WPoM34AcvOqmMFU4KyAvQLMJH9du"
+AIO_KEY = "aio_WktY39a5Lki2zWdvSLxJL77NSPAI"
 AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation","location"]
 
 global_equation="x1+x2+x3"
-
+location_to_check = (11.106550, 106.613027)  #VGU
 
 
 def connected(client):
@@ -65,7 +65,8 @@ def modify_value(x1,x2,x3):
 
 
 def publish_gps_to_adafruit_io(latitude, longitude):
-
+    #latitude_str = str(latitude)
+    #longitude_str = str(longitude)
 
     aio_headers = {
         'X-AIO-Key': AIO_KEY,
@@ -126,12 +127,12 @@ init_glogal_equation()
 while True:
 
     if sensor.USE_REAL_SENSOR_DATA:
+
         s1 = requestData ("0")
         s2 = requestData("1")
         time.sleep(1)
     else:
 
-        print("using simulated data")
         s1, s2 = sensor.generateRandomTH()
         time.sleep(1)
 
@@ -141,11 +142,16 @@ while True:
     client.publish("sensor3", s3)
     time.sleep(2)
     client.publish("test feed", modify_value (s1,s2,s3))
+
     latitude, longitude = gps.read_gps_data()
     print(f'Latitude: {latitude}, Longitude: {longitude}')
-
-
     publish_gps_to_adafruit_io(latitude, longitude)
+    
+    distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
+    if distance <= 0.5:
+        client.publish("button1","1")
+    else:
+        client.publish("button1","0")
 
 
     time.sleep(10)
