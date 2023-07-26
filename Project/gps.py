@@ -1,9 +1,10 @@
 import random
 import serial
+import sensor
 
 
 # Define the serial port and baud rate to match the Arduino
-SERIAL_PORT = '/dev/ttyUSB0'  # Replace with the actual serial port for your Arduino
+SERIAL_PORT = sensor.get_port()  # Find connected port name in the system
 BAUD_RATE = 9600
 
 # Define the bounding box for generating random GPS coordinates
@@ -13,6 +14,7 @@ BEN_CAT_GPS_REGION = {
     'min_lon': 106.580999,  # Minimum longitude (approximate longitude of Café Tiến Anh)
     'max_lon': 106.658452   # Maximum longitude (approximate longitude of Miếu Bà)
 }
+
 
 def read_gps_data():
     try:
@@ -31,8 +33,9 @@ def read_gps_data():
         longitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6)
         return latitude, longitude
 
-#mqtt
-#try:
+
+# mqtt
+# try:
 #    while True:
 #        latitude, longitude = read_gps_data()
 #        print(f"Latitude: {latitude}, Longitude: {longitude}")
@@ -43,5 +46,5 @@ def read_gps_data():
 
 #        time.sleep(1)
 #
-#except KeyboardInterrupt:
+# except KeyboardInterrupt:
 #    print("Keyboard interrupt. Stopping...")

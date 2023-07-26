@@ -1,0 +1,2 @@
+0 Human presence
+1 Empty
