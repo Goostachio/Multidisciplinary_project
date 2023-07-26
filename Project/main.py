@@ -5,13 +5,15 @@ from Adafruit_IO import MQTTClient
 import requests
 import sensor
 import gps
-import human_detector
+import Project.human_detector as human_detector
 from math import radians, sin, cos, sqrt, atan2
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = "aio_dZTr31xI4vz8oLrXs34yXAKIoqkS"
+key = open("key.txt")
+AIO_KEY = "aio_bKpR50tGrxwaCfVZ37sxZIMWY5xo"
+key.close()
 AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 
 global_equation = "x1+x2+x3"
