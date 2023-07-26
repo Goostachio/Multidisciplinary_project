@@ -10,7 +10,7 @@ from math import radians, sin, cos, sqrt, atan2
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2","equation","location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-AIO_KEY = "aio_WktY39a5Lki2zWdvSLxJL77NSPAI"
+AIO_KEY = "aio_jeoa49rlUiJYm1nSxDarn7PamnGO"
 AIO_IDs=["sensor1", "sensor2", "sensor3", "button1", "button2", "equation","location"]
 
 global_equation="x1+x2+x3"
@@ -83,6 +83,11 @@ def publish_gps_to_adafruit_io(latitude, longitude):
         print(f'Failed to publish GPS data. Status code: {response.status_code}')
 
 
+# Time frame (in seconds)
+time_frame = 60
+
+# Minimum distance threshold (in meters)
+min_distance_threshold = 10
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371.0  # Earth's radius in kilometers
@@ -98,7 +103,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     a = sin(d_lat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(d_lon / 2)**2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-    distance = R * c
+    distance = R * c * 1000
     return distance
     
 
@@ -147,11 +152,25 @@ while True:
     print(f'Latitude: {latitude}, Longitude: {longitude}')
     publish_gps_to_adafruit_io(latitude, longitude)
     
-    distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
-    if distance <= 0.5:
-        client.publish("button1","1")
+    start_time = time.time()
+
+    # Calculate the distance to the target coordinates
+    distance_to_target = calculate_distance(latitude, longitude,location_to_check[0], location_to_check[1])
+
+    # Check if GPS is getting closer or further away from the target
+    if distance_to_target < min_distance_threshold:
+        print("GPS is getting closer (1)")
     else:
-        client.publish("button1","0")
+        print("GPS is getting further away (0)")
+
+    # Check the time elapsed in the time frame
+ 
+
+#    distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
+#    if distance <= 3:
+#        client.publish("button1","1")
+#    else:
+#        client.publish("button1","0")
 
 
     time.sleep(10)
