@@ -16,7 +16,7 @@ BEN_CAT_GPS_REGION = {
 }
 
 
-def read_gps_data():
+def read_gps_data(this_latitude, this_longitude):
     try:
         with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
             while True:
@@ -29,9 +29,9 @@ def read_gps_data():
                     return latitude, longitude
     except serial.SerialException:
         # Serial port not accessible, generate random GPS coordinates instead
-        latitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lat'], BEN_CAT_GPS_REGION['max_lat']), 6)
-        longitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6)
-        return latitude, longitude
+        ### latitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lat'], BEN_CAT_GPS_REGION['max_lat']), 6)
+        ### longitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6)
+        return this_latitude, this_longitude
 
 
 # mqtt

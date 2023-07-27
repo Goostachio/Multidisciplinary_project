@@ -5,14 +5,14 @@ from Adafruit_IO import MQTTClient
 import requests
 import sensor
 import gps
-import Project.human_detector as human_detector
+import human_detector
 from math import radians, sin, cos, sqrt, atan2
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
 key = open("key.txt")
-AIO_KEY = "aio_bKpR50tGrxwaCfVZ37sxZIMWY5xo"
+AIO_KEY = key.read()
 key.close()
 AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 
@@ -139,10 +139,10 @@ is_on = False  # To tell whether the AC is on or off
 
 
 counter = 0  # Use to get the index of the below 2 lists
-temp_humid_file = open("temperature_humidity.txt", "r")  # Open "temperature_humidity.txt"
-temp_humid_list = list(csv.reader(temp_humid_file))  # Create a list (array) from temp_humid_file CSV (easier for me to work with)
-temp_humid_length = len(temp_humid_list)  # Size of array
-temp_humid_file.close()
+temp_humid_coord_file = open("temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
+temp_humid_coord_list = list(csv.reader(temp_humid_coord_file))  # Create a list (array) from temp_humid_file CSV (easier for me to work with)
+temp_humid_coord_length = len(temp_humid_coord_list)  # Size of array
+temp_humid_coord_file.close()
 
 
 def is_previous_on_off_if_block(this_tag):  # Read explanation in the ON/OFF AUTOMATION LOGIC for better understanding
@@ -168,6 +168,8 @@ while True:
 
         temperature = request_data("0")
         humidity = request_data("1")
+        latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
+                                                float(temp_humid_coord_list[counter][3]))
         time.sleep(1)
     else:
 
@@ -175,12 +177,15 @@ while True:
         ###  temperature, humidity = sensor.generate_random_temp_humid()
 
         # Read value from files
-        temperature = float(temp_humid_list[counter][0].strip())  # The 2nd dimension index has to be 0
-        humidity = float(temp_humid_list[counter][1].strip())  # The 2nd dimension index has to be 1
+        temperature = float(temp_humid_coord_list[counter][0].strip())  # The 2nd dimension index has to be 0
+        humidity = float(temp_humid_coord_list[counter][1].strip())  # The 2nd dimension index has to be 1
+        latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
+                                                float(temp_humid_coord_list[counter][3]))
         counter += 1
-        if counter > temp_humid_length:  # Loop back from the beginning when reach the end
+        if counter > temp_humid_coord_length:  # Loop back from the beginning when reach the end
             counter = 0
 
+        print(f'Latitude: {latitude}, Longitude: {longitude}')
         time.sleep(1)
 
     human_detector_result = human_detector.detection()
@@ -188,18 +193,15 @@ while True:
     client.publish("sensor1", temperature)
     client.publish("sensor2", humidity)
     client.publish("ai", human_detector_result)
-    time.sleep(2)
-    # client.publish("test feed", modify_value(temperature, humidity))
-
-    latitude, longitude = gps.read_gps_data()
-    print(f'Latitude: {latitude}, Longitude: {longitude}')
     publish_gps_to_adafruit_io(latitude, longitude)
-
     distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
+    print("Distance: ", distance)
     human_detector_result = human_detector.detection()
 
+    time.sleep(2)
+
     # ON/OFF AUTOMATION LOGIC
-    if human_detector_result == "Human presence" and temperature > 20:  # First if block -> tag = 0
+    if human_detector_result == "Human presence" and temperature > 28:  # First if block -> tag = 0
         # If the tag is not equal to 0 (the first if block) set 'tag' to 0 and reset 'second' to 0
         # This prevents conflict between each if block. For example, if the 1st 'if block' is only
         # executed half way (second = 200)
@@ -207,7 +209,7 @@ while True:
         # can be executed correctly (if 'second' is not set to 0 the instruction will be run immediately, which defeats
         # the 60-second delay logic)
         # But when a 'if block' is executed consecutively, then 'second' should not be set back to 0
-
+        # print("If Block 0 true")
         is_previous_on_off_if_block(0)  # First if block -> on_off_tag = 0
 
         if on_off_second > trigger_point/5:
@@ -215,23 +217,26 @@ while True:
             on_off_second = 0
             is_on = True
 
-    elif distance <= 1 and temperature > 30:
+    elif distance <= 1 and temperature > 28:
+        # print("If Block 1 true")
         is_previous_on_off_if_block(1)  # Second if block -> on_off_tag = 1
-        if on_off_second > trigger_point + trigger_point/2:
+        if on_off_second > trigger_point/5:
             client.publish("button1", "1")
             on_off_second = 0
             if_on = True
 
     elif temperature < 24:
+        # print("If Block 2 true")
         is_previous_on_off_if_block(2)  # Third if block -> on_off_tag = 2
-        if on_off_second > trigger_point * 9:
+        if on_off_second > trigger_point/5:
             client.publish("button1", "0")
             on_off_second = 0
             is_on = False
 
     elif distance > 1 and human_detector_result == "Empty":
+        # print("If Block 3 true")
         is_previous_on_off_if_block(3)  # Fourth if block -> on_off_tag = 3
-        if on_off_second > trigger_point:
+        if on_off_second > trigger_point/5:
             client.publish("button1", "0")
             on_off_second = 0
             is_on = False
@@ -239,12 +244,12 @@ while True:
     # MODE AUTOMATION LOGIC
     if is_on is True and humidity > 70:
         is_previous_mode_if_block(0)  # First if block -> mode_tag = 0
-        if mode_second > trigger_point:
+        if mode_second > trigger_point/5:
             client.publish("button2", "1")
             mode_second = 0
     elif is_on is False and humidity <= 70:
         is_previous_mode_if_block(1)  # Second if block -> mode_tag = 1
-        if mode_second > trigger_point:
+        if mode_second > trigger_point/5:
             client.publish("button2", "0")
             mode_second = 0
 
