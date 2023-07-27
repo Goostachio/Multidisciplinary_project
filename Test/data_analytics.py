@@ -1,6 +1,6 @@
-#still in development, needs some layouts
+#complete version
 import dash
-from dash import html, dcc, callback, Input, Output
+from dash import Dash, html, dash_table, dcc, callback, Input, Output
 import pandas as pd
 from datetime import datetime, timezone
 import dateutil.parser
@@ -51,17 +51,36 @@ def timeDeltaToday(date):
 
 # Layout
 app.layout = html.Div([
-    html.H1("AC stats", style={'text-align': 'center'}),
+    html.H1("Your AC statistics", style={'text-align': 'center'}),
+    dcc.Interval(id='interval', interval = 2000),
     html.Div([
-        html.Div(id='power-used', children="0", className='box', style={'width': '50%', 'display': 'inline-block'}),
-        dcc.Interval(id='interval', interval = 2000),
-        html.Div(id='current-pay', children="0", className='box', style={'width': '50%', 'display': 'inline-block'})
-    ]),
-    html.Div([
-        dcc.Graph(id='pie-chart', figure={}),
-        html.Div(id='bar-chart',className='box', style={'width': '50%', 'display': 'inline-block'})
-    ])
-])
+            # First column
+            html.Div([
+                dbc.Row(dbc.Col(
+                    html.Div([
+                        html.H3(children="Power used in this session (kWh):", className='box', style={'font-size': "24px", 'width': '100%', 'display': 'inline-block'}),
+                        html.Div(id='power-used', children="0", className='box', style={'font-size': "12px", 'width': '100%', 'display': 'inline-block'}),
+                    ])
+                )
+        ),
+                dbc.Row(dbc.Col(
+                    html.Div([
+                        html.H3(children="Current payment this session (VND):", className='box', style={'font-size': "24px", 'width': '100%', 'display': 'inline-block'}),
+                        html.Div(id='current-pay', children="0", className='box', style={'font-size': "12px",'width': '100%', 'display': 'inline-block'}),
+                    ])
+                )
+        ),
+            ], className="col-4"),
+
+            # Second column
+            html.Div([
+                html.Div(children="Usage in the day", className='box', style={'font-size': "24px",'width': '100%', 'display': 'inline-block', 'color': 'white'}),
+                html.Hr(style={"width": "50%", "margin": "auto"}),
+                dcc.Graph(id='pie-chart', figure={}),
+            ], className="col-8")
+        ], className="row")])
+
+
 
 # Callback for power used in session
 @app.callback(
@@ -72,13 +91,13 @@ app.layout = html.Div([
 def update_power_used(n_intervals):
     #fetch api from button
     # define API endpoint and key
-    url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-    headers = {"X-AIO-Key": "aio_IlPm69I1sed0kuU0bFHaDWavWWoR"}
+    url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+    headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
     timeFrame = requests.get(url, headers=headers).json()
 
     #fetch api of humidity
     url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-    headers = {"X-AIO-Key": "aio_IlPm69I1sed0kuU0bFHaDWavWWoR"}
+    headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
     response = requests.get(url, headers=headers).json()
     humidity = int(float(response['last_value']))
 
@@ -106,7 +125,7 @@ def update_power_used(n_intervals):
 
 
     power_used += (tick/3600)*(actualW(humidity)/1000)
-    return html.H2(f"Power used in session (kWs): {power_used:.2f}") #in kWs
+    return html.H2(f"{power_used:.2f} (kWh)") #in kWs
 
 
 # Callback for current pay this month
@@ -119,7 +138,7 @@ def update_power_used(n_intervals):
 def update_current_pay(power_used):
     # fetch api of humidity
     url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-    headers = {"X-AIO-Key": "aio_IlPm69I1sed0kuU0bFHaDWavWWoR"}
+    headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
     response = requests.get(url, headers=headers).json()
     humidity = int(float(response['last_value']))
 
@@ -129,9 +148,9 @@ def update_current_pay(power_used):
         power_used = (tick/3600)*(actualW(humidity)/1000)
         current_pay += acPaymentCalc(power_used)
 
-        return html.H2(f"Current pay this month (VND): {current_pay:.2f}")
+        return html.H2(f"{current_pay:.2f} (VND) ")
 
-    return html.H2("Current pay this month: 0")
+    return html.H2("0 (VND)")
 
 
 # Callback for pie chart
@@ -143,8 +162,8 @@ def update_current_pay(power_used):
 def update_pie_chart(n_intervals):
     # fetch api from button
     # define API endpoint and key
-    url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-    headers = {"X-AIO-Key": "aio_IlPm69I1sed0kuU0bFHaDWavWWoR"}
+    url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+    headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
     timeFrame = requests.get(url, headers=headers).json()
 
     global morning
