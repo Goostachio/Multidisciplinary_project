@@ -11,9 +11,11 @@ from math import radians, sin, cos, sqrt, atan2
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-key = open("key.txt")
-AIO_KEY = key.read()
-key.close()
+aio = open("aio.txt")
+serial = open("serial.txt")
+AIO_KEY = aio.read()+serial.read()
+aio.close()
+serial.close()
 AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
 
 global_equation = "x1+x2+x3"
