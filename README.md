@@ -14,7 +14,7 @@ sensory.
 ## Getting Started
 ### Prerequisites
 
-Before you proceed, ensure that you have Python 3.8 installed with these libraries:
+Before you proceed, ensure that you have Python version 3.8 or above installed with these libraries:
 
 - adafruit-io
 - tensorflow
@@ -28,5 +28,4 @@ A free account on [Adafruit IO](https://io.adafruit.com/) is also required.
 ### Installation
 
 1. Clone the repository.
-2. Create a file named "key" and save your Adafruit IO key there.
-3. Run the main.py file.
+2. Run the main.py file.
