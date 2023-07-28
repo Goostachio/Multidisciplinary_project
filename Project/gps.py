@@ -1,50 +1,42 @@
-import random
 import serial
 import sensor
 
-
-# Define the serial port and baud rate to match the Arduino
+# Define the serial port and baud rate to match the Arduino source sode
 SERIAL_PORT = sensor.get_port()  # Find connected port name in the system
-BAUD_RATE = 9600
+BAUD_RATE = 9600 
 
-# Define the bounding box for generating random GPS coordinates
-BEN_CAT_GPS_REGION = {
-    'min_lat': 11.072128,  # Minimum latitude (approximate latitude of Thị Tính river)
-    'max_lat': 11.134877,  # Maximum latitude (approximate latitude of Vitadairy Binh Duong factory)
-    'min_lon': 106.580999,  # Minimum longitude (approximate longitude of Café Tiến Anh)
-    'max_lon': 106.658452   # Maximum longitude (approximate longitude of Miếu Bà)
-}
-
-
-def read_gps_data(this_latitude, this_longitude):
+# A function to read data from port
+def read_gps_data(sim_latitude, sim_longitude):
+    # The parameters this function takes is for a simulated gps coordinates that is stored in a text file
+    # In the case that the serial port is accessed, it will read from the port as below
+    
     try:
-        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+        # Open the serial port and set the baud rate and timeout
+        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser: 
+            
+            # Continuously read data from the serial port
             while True:
-                line = ser.readline().decode('utf-8').strip()
+
+                # Read a line of text from the serial port and decode it to a string
+                line = ser.readline().decode('utf-8').strip() 
+
+                # Check if the line contains GPS coordinate data in the format "Latitude= ... Longitude= ..."
                 if line.startswith("Latitude= ") and line.count(" Longitude= ") == 1:
-                    # Extract latitude and longitude values from the line
+
+                    # Split the line into three parts based on whitespace characters
                     _, lat_str, lon_str = line.split()
+
+                    # Convert the latitude and longitude strings to floating-point numbers 
+                    # for distance calculations in the main source code
                     latitude = float(lat_str)
                     longitude = float(lon_str)
+
+                    #return the processed coordinates
                     return latitude, longitude
+                
+    # In the case that the serial port is not accessible, this function returns coordinate values from paramater         
     except serial.SerialException:
-        # Serial port not accessible, generate random GPS coordinates instead
-        ### latitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lat'], BEN_CAT_GPS_REGION['max_lat']), 6)
-        ### longitude = round(random.uniform(BEN_CAT_GPS_REGION['min_lon'], BEN_CAT_GPS_REGION['max_lon']), 6)
-        return this_latitude, this_longitude
+        return sim_latitude, sim_longitude
 
 
-# mqtt
-# try:
-#    while True:
-#        latitude, longitude = read_gps_data()
-#        print(f"Latitude: {latitude}, Longitude: {longitude}")
-#
-#        # Save both GPS coordinates to the text file
-#        with open('gps_coordinates.txt', 'a') as file:
-#            file.write(f"{latitude},{longitude}\n")
 
-#        time.sleep(1)
-#
-# except KeyboardInterrupt:
-#    print("Keyboard interrupt. Stopping...")

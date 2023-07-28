@@ -9,16 +9,16 @@ import human_detector
 from math import radians, sin, cos, sqrt, atan2
 
 
-AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
+AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
 aio = open("aio.txt")
 serial = open("serial.txt")
 AIO_KEY = aio.read()+serial.read()
 aio.close()
 serial.close()
-AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "equation", "location"]
+AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 
-global_equation = "x1+x2+x3"
+
 location_to_check = (11.106550, 106.613027)  # VGU
 
 
@@ -40,22 +40,6 @@ def disconnected(this_client):
 def message(this_client, feed_id, payload):
     print("Nhan du lieu: " + feed_id + " " + payload)
 
-    if feed_id == "equation":
-        global global_equation
-        global_equation = payload
-        print(global_equation)
-        return
-
-    if feed_id == "button1":
-        if payload == "ON":
-            print("Bat den...")
-            sensor.send_command("2")
-            return
-
-        if payload == "OFF":
-            print("Tat den...")
-            sensor.send_command("3")
-            return
 
 
 def init_global_equation():
@@ -68,15 +52,9 @@ def init_global_equation():
     print("Get latest value:", global_equation)
 
 
-# def modify_value(x1, x2, x3):
-#     result = eval(global_equation)
-#     print(result)
-#     return result
 
 
 def publish_gps_to_adafruit_io(this_latitude, this_longitude):
-    # latitude_str = str(latitude)
-    # longitude_str = str(longitude)
 
     aio_headers = {
         'X-AIO-Key': AIO_KEY,
@@ -127,7 +105,6 @@ client.on_message = message
 client.on_subscribe = subscribe
 client.connect()
 client.loop_background()
-init_global_equation()
 
 
 on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
