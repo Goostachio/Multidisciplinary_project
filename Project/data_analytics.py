@@ -1,6 +1,6 @@
-#complete version
+#complete version, implemented to main.py
 import dash
-from dash import Dash, html, dash_table, dcc, callback, Input, Output
+from dash import html, dcc, Input, Output
 import pandas as pd
 from datetime import datetime, timezone
 import dateutil.parser
