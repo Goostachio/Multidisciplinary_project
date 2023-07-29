@@ -1,5 +1,5 @@
 import serial
-import sensor
+from sensors import sensor
 
 # Define the serial port and baud rate to match the Arduino source sode
 SERIAL_PORT = sensor.get_port()  # Find connected port name in the system

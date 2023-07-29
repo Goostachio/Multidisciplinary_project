@@ -3,9 +3,9 @@ import sys
 import time
 from Adafruit_IO import MQTTClient
 import requests
-import sensors.sensor
-import sensors.gps
-import camera.human_detector
+from sensors import sensor
+from sensors import gps
+from camera import human_detector
 from math import radians, sin, cos, sqrt, atan2
 
 
@@ -90,9 +90,9 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 
 def request_data(cmd):
-    sensors.sensor.send_command(cmd)
+    sensor.send_command(cmd)
     time.sleep(2)
-    temp_hum = sensors.sensor.read_serial()
+    temp_hum = sensor.read_serial()
 
     return temp_hum
 
@@ -143,11 +143,11 @@ def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOM
 
 
 while True:
-    if sensors.sensor.USE_REAL_SENSOR_DATA:
+    if sensor.USE_REAL_SENSOR_DATA:
 
         temperature = request_data("0")
         humidity = request_data("1")
-        latitude, longitude = sensors.gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
+        latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
                                                 float(temp_humid_coord_list[counter][3]))
         time.sleep(1)
     else:
@@ -156,7 +156,7 @@ while True:
         # Read value from files
         temperature = float(temp_humid_coord_list[counter][0].strip())  # The 2nd dimension index has to be 0
         humidity = float(temp_humid_coord_list[counter][1].strip())  # The 2nd dimension index has to be 1
-        latitude, longitude = sensors.gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
+        latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
                                                 float(temp_humid_coord_list[counter][3]))
         counter += 1
         if counter > temp_humid_coord_length:  # Loop back from the beginning when reach the end
@@ -165,7 +165,7 @@ while True:
         print(f'Latitude: {latitude}, Longitude: {longitude}')
         time.sleep(1)
 
-    human_detector_result = camera.human_detector.detection()
+    human_detector_result = human_detector.detection()
 
     client.publish("sensor1", temperature)
     client.publish("sensor2", humidity)
@@ -173,7 +173,7 @@ while True:
     publish_gps_to_adafruit_io(latitude, longitude)
     distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
     print("Distance: ", distance)
-    human_detector_result = camera.human_detector.detection()
+    human_detector_result = human_detector.detection()
 
     time.sleep(2)
 
