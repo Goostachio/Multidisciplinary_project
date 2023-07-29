@@ -23,7 +23,8 @@ try: # Try to open a serial connection with the obtained port and set the baud r
 
 except: # If the connection cannot be established
     USE_REAL_SENSOR_DATA = False 
-    # set to be False to indicate that ports couldn't be accessed (main source code will use this as a condition)
+    # set to be False to indicate that ports couldn't be accessed
+    # This will be used in the main file 
 
 # Function to send a command to the connected device through the serial port
 def send_command(cmd):
