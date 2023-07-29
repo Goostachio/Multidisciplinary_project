@@ -50,35 +50,102 @@ def timeDeltaToday(date):
     return datetime.combine(datetime.today(),datetime.today().time())- datetime.combine(changeFormat(date).date(),changeFormat(date).time())
 
 # Layout
-app.layout = html.Div([
-    html.H1("Your AC statistics", style={'text-align': 'center'}),
-    dcc.Interval(id='interval', interval = 2000),
-    html.Div([
-            # First column
-            html.Div([
-                dbc.Row(dbc.Col(
-                    html.Div([
-                        html.H3(children="Power used in this session (kWh):", className='box', style={'font-size': "24px", 'width': '100%', 'display': 'inline-block'}),
-                        html.Div(id='power-used', children="0", className='box', style={'font-size': "12px", 'width': '100%', 'display': 'inline-block'}),
-                    ])
-                )
+app.layout = html.Div(
+    style={
+        "background-image": "url('/assets/image.jpg')",  
+        "background-size": "cover",
+        "background-repeat": "no-repeat",
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+        "height": "100vh",
+    },
+    children=[
+        html.H1("Your AC Statistics", style={"color": "white"}),
+        dcc.Interval(id="interval", interval=2000),
+        html.Div(
+            style={
+                "display": "flex",
+                "flex-direction": "row",
+                "justify-content": "center",
+                "width": "100%",
+            },
+            children=[
+                html.Div(
+                    style={"flex": "1", "margin": "10px"},
+                    children=[
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    html.H3(
+                                        "Power Used in This Session (kWh)",
+                                        className="card-title",
+                                        style={"text-align": "center"},
+                                    ),
+                                    html.Div(
+                                        id="power-used",
+                                        children="0",
+                                        className="card-text",
+                                        style={"font-size": "36px"},
+                                    ),
+                                ]
+                            ),
+                            color="primary",
+                            outline=True,
+                        ),
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    html.H3(
+                                        "Current Payment This Session (VND)",
+                                        className="card-title",
+                                        style={"text-align": "center",
+                                               "color": "white"},
+                                    ),
+                                    html.Div(
+                                        id="current-pay",
+                                        children="0",
+                                        className="card-text",
+                                        style={"font-size": "36px"},
+                                    ),
+                                ]
+                            ),
+                            color="success",
+                            outline=True,
+                        ),
+                    ],
+                ),
+                html.Div(
+                    style={"flex": "1", "margin": "10px"},
+                    children=[
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    html.Div(
+                                        "Usage in the Day",
+                                        className="card-title",
+                                        style={
+                                            "font-size": "24px",
+                                            "color": "white",
+                                            "text-align": "center",
+                                        },
+                                    ),
+                                    dcc.Graph(
+                                        id="pie-chart",
+                                        figure={},
+                                        style={"height": "400px"},
+                                    ),
+                                ]
+                            ),
+                            color="info",
+                            outline=True,
+                        )
+                    ],
+                ),
+            ],
         ),
-                dbc.Row(dbc.Col(
-                    html.Div([
-                        html.H3(children="Current payment this session (VND):", className='box', style={'font-size': "24px", 'width': '100%', 'display': 'inline-block'}),
-                        html.Div(id='current-pay', children="0", className='box', style={'font-size': "12px",'width': '100%', 'display': 'inline-block'}),
-                    ])
-                )
-        ),
-            ], className="col-4"),
-
-            # Second column
-            html.Div([
-                html.Div(children="Usage in the day", className='box', style={'font-size': "24px",'width': '100%', 'display': 'inline-block', 'color': 'white'}),
-                html.Hr(style={"width": "50%", "margin": "auto"}),
-                dcc.Graph(id='pie-chart', figure={}),
-            ], className="col-8")
-        ], className="row")])
+    ],
+)
 
 
 
