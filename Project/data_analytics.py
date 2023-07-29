@@ -80,7 +80,8 @@ app.layout = html.Div(
                                     html.H3(
                                         "Power Used in This Session (kWh)",
                                         className="card-title",
-                                        style={"text-align": "center"},
+                                        style={"text-align": "center",
+                                               "color": "white"},
                                     ),
                                     html.Div(
                                         id="power-used",
@@ -178,7 +179,7 @@ def update_power_used(n_intervals):
         payment = [changeFormat(timeFrame["created_at"]),power_used,acPaymentCalc(power_used)]
 
         #should be in a seperate func to save in a .csv file but don't work. pls help
-        with open("pay.csv", 'a') as csvfile:
+        with open("/data/pay.csv", 'a') as csvfile:
             # creating a csv writer object
             csvwriter = csv.writer(csvfile)
 
@@ -243,7 +244,7 @@ def update_pie_chart(n_intervals):
             #reset morning, afternoon and evening values and save to a csv file at midnight
             # should be in a seperate func to save in a .csv file but don't work. pls help
             tracking = [changeFormat(timeFrame["created_at"]).date(),morning,afternoon,evening]
-            with open("usage_tracking.csv", 'a') as csvfile:
+            with open("/data/usage_tracking.csv", 'a') as csvfile:
                 # creating a csv writer object
                 csvwriter = csv.writer(csvfile)
 
