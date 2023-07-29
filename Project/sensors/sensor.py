@@ -22,7 +22,6 @@ try: # Try to open a serial connection with the obtained port and set the baud r
     ser = serial.Serial(port=get_port(), baudrate=115200)
 
 except: # If the connection cannot be established
-    print("Can not open the port. Using simulated data.") # print message
     USE_REAL_SENSOR_DATA = False 
     # set to be False to indicate that ports couldn't be accessed (main source code will use this as a condition)
 

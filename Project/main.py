@@ -20,9 +20,6 @@ serial.close()
 AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 
 
-location_to_check = (11.106550, 106.613027)  # VGU
-
-
 def connected(this_client):
     print("Ket noi thanh cong ...")
     for i in AIO_IDs:
@@ -89,6 +86,8 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     this_distance = r * c
     return this_distance
 
+location_to_check = (11.106550, 106.613027)  # VGU
+
 
 def request_data(cmd):
     sensor.send_command(cmd)
@@ -143,6 +142,7 @@ def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOM
     mode_second += 10
 
 
+
 #main app
 while True:
     if sensor.USE_REAL_SENSOR_DATA:
@@ -164,6 +164,7 @@ while True:
         if counter > temp_humid_coord_length:  # Loop back from the beginning when reach the end
             counter = 0
 
+        print("Can not open the port. Using simulated data.") # print message
         print(f'Latitude: {latitude}, Longitude: {longitude}')
         time.sleep(1)
 
