@@ -7,7 +7,7 @@ from sensors import sensor
 from sensors import gps
 from camera import human_detector
 from math import radians, sin, cos, sqrt, atan2
-
+import data_analytics
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
@@ -238,4 +238,5 @@ while True:
 
     pass
 
+run_Dash()
 
