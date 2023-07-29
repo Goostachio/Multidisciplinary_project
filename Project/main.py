@@ -12,8 +12,8 @@ from math import radians, sin, cos, sqrt, atan2
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-aio = open("Project/key/aio.txt")
-serial = open("Project/key/aio_serial.txt")
+aio = open("key/aio.txt")
+serial = open("key/aio_serial.txt")
 AIO_KEY = aio.read()+serial.read()
 aio.close()
 serial.close()
@@ -119,7 +119,7 @@ is_on = False  # To tell whether the AC is on or off
 
 
 counter = 0  # Use to get the index of the below 2 lists
-temp_humid_coord_file = open("Project/data/temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
+temp_humid_coord_file = open("data/temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
 temp_humid_coord_list = list(csv.reader(temp_humid_coord_file))  # Create a list (array) from temp_humid_file CSV (easier for me to work with)
 temp_humid_coord_length = len(temp_humid_coord_list)  # Size of array
 temp_humid_coord_file.close()
@@ -233,6 +233,7 @@ while True:
             mode_second = 0
 
     time.sleep(10)
+
 
     pass
 
