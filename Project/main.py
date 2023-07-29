@@ -5,14 +5,14 @@ from Adafruit_IO import MQTTClient
 import requests
 from sensors import sensor
 from sensors import gps
-from camera import human_detector
+#from camera import human_detector
 from math import radians, sin, cos, sqrt, atan2
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
-aio = open("/key/aio.txt")
-serial = open("/key/aio_serial.txt")
+aio = open("/Users/daohongminh/Desktop/Project/Project/key/aio.txt")
+serial = open("/Users/daohongminh/Desktop/Project/Project/key/aio_serial.txt")
 AIO_KEY = aio.read()+serial.read()
 aio.close()
 serial.close()
@@ -118,7 +118,7 @@ is_on = False  # To tell whether the AC is on or off
 
 
 counter = 0  # Use to get the index of the below 2 lists
-temp_humid_coord_file = open("/data/temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
+temp_humid_coord_file = open("/Users/daohongminh/Desktop/Project/Project/data/temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
 temp_humid_coord_list = list(csv.reader(temp_humid_coord_file))  # Create a list (array) from temp_humid_file CSV (easier for me to work with)
 temp_humid_coord_length = len(temp_humid_coord_list)  # Size of array
 temp_humid_coord_file.close()
@@ -165,20 +165,20 @@ while True:
         print(f'Latitude: {latitude}, Longitude: {longitude}')
         time.sleep(1)
 
-    human_detector_result = human_detector.detection()
+    #human_detector_result = human_detector.detection()
 
     client.publish("sensor1", temperature)
     client.publish("sensor2", humidity)
-    client.publish("ai", human_detector_result)
+    #client.publish("ai", human_detector_result)
     publish_gps_to_adafruit_io(latitude, longitude)
     distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
     print("Distance: ", distance)
-    human_detector_result = human_detector.detection()
+    #human_detector_result = human_detector.detection()
 
     time.sleep(2)
 
-    # ON/OFF AUTOMATION LOGIC
-    if human_detector_result == "Human presence" and temperature > 28:  # First if block -> tag = 0
+    # ON/OFF AUTOMATION LOGIC human_detector_result == "Human presence" and
+    if  temperature > 28:  # First if block -> tag = 0
         # If the tag is not equal to 0 (the first if block) set 'tag' to 0 and reset 'second' to 0
         # This prevents conflict between each if block. For example, if the 1st 'if block' is only
         # executed half way (second = 200)
@@ -210,8 +210,8 @@ while True:
             on_off_second = 0
             is_on = False
 
-    elif distance > 1 and human_detector_result == "Empty":
-        # print("If Block 3 true")
+    elif distance > 1  :
+        # print("If Block 3 true") and human_detector_result == "Empty"
         is_previous_on_off_if_block(3)  # Fourth if block -> on_off_tag = 3
         if on_off_second > trigger_point/5:
             client.publish("button1", "0")
