@@ -35,5 +35,4 @@ A free account on [Adafruit IO](https://io.adafruit.com/) is also required.
 
 1. Clone the repository.
 2. Run the main.py file.
-3. Visit http://127.0.0.1:8050/ for the data analytics (shown on a local dashboard).
-4. visit https://io.adafruit.com/Multidisciplinary_Project/dashboards/ai-iot-dashboard?kiosk=true to view the adafruit dashboard.
+3. visit https://io.adafruit.com/Multidisciplinary_Project/dashboards/ai-iot-dashboard?kiosk=true to view the adafruit dashboard.
