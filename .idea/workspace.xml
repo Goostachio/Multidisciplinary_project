@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0ba23491-9f14-4732-994f-e3c564a7ec0d" name="Changes" comment="implement da again">
+    <list default="true" id="0ba23491-9f14-4732-994f-e3c564a7ec0d" name="Changes" comment="major overhaul of pie chart's logic">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project/data_analytics.py" beforeDir="false" afterPath="$PROJECT_DIR$/Project/data_analytics.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -87,7 +88,7 @@
       <workItem from="1690457913038" duration="260000" />
       <workItem from="1690552957972" duration="2152000" />
       <workItem from="1690636835703" duration="12138000" />
-      <workItem from="1690654691521" duration="315000" />
+      <workItem from="1690654691521" duration="3307000" />
     </task>
     <task id="LOCAL-00001" summary="multi-threading method for performance problems.">
       <created>1687255302377</created>
@@ -145,7 +146,14 @@
       <option name="project" value="LOCAL" />
       <updated>1690654967770</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="implement da again">
+      <created>1690655045929</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1690655045929</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
