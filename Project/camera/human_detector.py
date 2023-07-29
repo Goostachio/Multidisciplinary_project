@@ -6,15 +6,15 @@ import numpy as np
 np.set_printoptions(suppress=True)
 
 # Load the model
-model = load_model("keras_Model.h5", compile=False)
+model = load_model("Project/camera/keras_model.h5", compile=False)
 
 # Load the labels
-class_names = open("labels.txt", "r").readlines()
+class_names = open("Project/camera/labels.txt", "r").readlines()
 
 # CAMERA can be 0 or 1 based on default camera of your computer
 camera = cv2.VideoCapture(0)
 
-while True:
+def detection():
     # Grab the webcamera's image.
     ret, image = camera.read()
 
@@ -22,7 +22,7 @@ while True:
     image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_AREA)
 
     # Show the image in a window
-    cv2.imshow("Webcam Image", image)
+    # cv2.imshow("Webcam Image", image)
 
     # Make the image a numpy array and reshape it to the models input shape.
     image = np.asarray(image, dtype=np.float32).reshape(1, 224, 224, 3)
@@ -39,13 +39,5 @@ while True:
     # Print prediction and confidence score
     print("Class:", class_name[2:], end="")
     print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
+    return class_name[2:]
 
-    # Listen to the keyboard for presses.
-    keyboard_input = cv2.waitKey(1)
-
-    # 27 is the ASCII for the esc key on your keyboard.
-    if keyboard_input == 27:
-        break
-
-camera.release()
-cv2.destroyAllWindows()
