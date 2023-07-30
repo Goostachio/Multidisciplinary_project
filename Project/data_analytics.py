@@ -41,21 +41,49 @@ def actualW(humidity):  #hudmidity may change ac's power input
     else:
         return 40*1.75
 
+def addToday(morning, afternoon, evening):
+    tracking = [datetime.today().date(), morning, afternoon, evening]
+    with open("/data/usage_tracking.csv", 'a') as csvfile:
+        # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+
+        # writing the data rows
+        csvwriter.writerow(tracking)
+
+        # close file
+        csvfile.close()
+
+def update_today(today, morning, afternoon, evening):
+    with open("/data/usage_tracking.csv", 'r') as file:
+        reader = csv.reader(file)
+        time = list(reader)
+
+    # Update the values in the last row
+    time[-1] = [today, morning, afternoon, evening]
+
+    # Open the CSV file in write mode and write the updated rows
+    with open(today, morning, afternoon, evening, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(time)
+        file.close()
+
+
+
 #initiate app
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.CYBORG])
 load_figure_template('Cyborg')
 
-    #used for later
+#used for later
 tick = 0 #live track time in sec
 power_used = 0
 morning = 0  # from 00:00 to 10:59
 afternoon = 0  # from 11:00 to 17:59
 evening = 0  # from 18:00 to 23:59
 
-    # Layout
+# Layout
 app.layout = html.Div(
     style={
-        "background-image": "url('/assets/for_ac.jpg')",
+        "background-image": "url('/assets/image.jpg')",
         "background-size": "cover",
         "background-repeat": "no-repeat",
         "display": "flex",
@@ -153,7 +181,7 @@ app.layout = html.Div(
 
 
 
-    # Callback for power used in session
+# Callback for power used in session
 @app.callback(
     Output('power-used', 'children'),
     Input('interval', 'n_intervals')
@@ -162,13 +190,13 @@ app.layout = html.Div(
 def update_power_used(n_intervals):
     #fetch api from button
     # define API endpoint and key
-    url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-    headers = {"X-AIO-Key": "aio_QchM14nMBqegxFwR8QCtrCPlMoUE"}
+    url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+    headers = {"X-AIO-Key": AIO_KEY}
     timeFrame = requests.get(url, headers=headers).json()
 
     #fetch api of humidity
     url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-    headers = {"X-AIO-Key": "aio_QchM14nMBqegxFwR8QCtrCPlMoUE"}
+    headers = {"X-AIO-Key": AIO_KEY}
     response = requests.get(url, headers=headers).json()
     humidity = int(float(response['last_value']))
 
@@ -182,7 +210,7 @@ def update_power_used(n_intervals):
         payment = [changeFormat(timeFrame["created_at"]),power_used,acPaymentCalc(power_used)]
 
         #should be in a seperate func to save in a .csv file but don't work. pls help
-        with open("pay.csv", 'a') as csvfile:
+        with open("data/pay.csv", 'a') as csvfile:
             # creating a csv writer object
             csvwriter = csv.writer(csvfile)
 
@@ -209,7 +237,7 @@ def update_power_used(n_intervals):
 def update_current_pay(power_used):
     # fetch api of humidity
     url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-    headers = {"X-AIO-Key": "aio_QchM14nMBqegxFwR8QCtrCPlMoUE"}
+    headers = {"X-AIO-Key": AIO_KEY}
     response = requests.get(url, headers=headers).json()
     humidity = int(float(response['last_value']))
 
@@ -233,40 +261,64 @@ def update_current_pay(power_used):
 def update_pie_chart(n_intervals):
     # fetch api from button
     # define API endpoint and key
-    url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-    headers = {"X-AIO-Key": AIO_KEY}
+    url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+    headers = {"X-AIO-Key": "aio_QchM14nMBqegxFwR8QCtrCPlMoUE"}
     timeFrame = requests.get(url, headers=headers).json()
+    record = changeFormat(timeFrame['created_at'])
 
     global morning
     global afternoon
     global evening
 
-    if timeFrame['last_value'] == "1":
-        #current_time = timeFrame['created_at'] + timeDeltaToday(changeFormat(timeFrame['created_at']))
-        if (timeFrame['created_at']) != datetime.today().date():
-            #reset morning, afternoon and evening values and save to a csv file at midnight
-            # should be in a seperate func to save in a .csv file but don't work. pls help
-            tracking = [changeFormat(timeFrame["created_at"]).date(),morning,afternoon,evening]
-            with open("data/usage_tracking.csv", 'a') as csvfile:
-                # creating a csv writer object
-                csvwriter = csv.writer(csvfile)
+    data = pd.DataFrame("/data/usage_tracking.csv")
 
-                # writing the data rows
-                csvwriter.writerow(tracking)
+    if timeFrame['last_value'] == "1": #is turned on
+        if record != datetime.today().date(): #the date is not today, means has come to the next day
+            if record in data['dates'].unique(): #update value if there is already the same date, or make a new one if it don't
+                if (record.hour >= 0) & (record.hour <= 10):
+                    morning += 1
+                elif (record.hour >= 11) & (record.hour <= 17):
+                    afternoon += 1
+                else:
+                    evening += 1
 
-                # close file
-                csvfile.close()
+                update_today(record,morning,afternoon,evening)
+            else:
+                    # evaluation
+                if (record.hour >= 0) & (record.hour <= 10):
+                    morning += 1
+                elif (record.hour >= 11) & (record.hour <= 17):
+                    afternoon += 1
+                else:
+                    evening += 1
+                addToday(morning,afternoon,evening)
+    elif record in data['date'].unique():
+        #pull, eval, update
+        morning = data.iloc[-1].morning
+        afternoon = data.iloc[-1].afternoon
+        evening = data.iloc[-1].evening
 
-            morning, afternoon, evening= 0, 0, 0
-        elif (changeFormat(timeFrame['created_at']).hour >=0) & (changeFormat(timeFrame['created_at']).hour <=10):
+        if (record.hour >= 0) & (record.hour <= 10):
             morning += 1
-        elif (changeFormat(timeFrame['created_at']).hour >=11) & (changeFormat(timeFrame['created_at']).hour <=17):
+        elif (record.hour >= 11) & (record.hour <= 17):
             afternoon += 1
         else:
-            evening +=1
-        df = pd.DataFrame(data=[["morning",morning],["afternoon",afternoon],["evening",evening]],columns=["Time of the day",'Duration'])
-        fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
-        return fig
+            evening += 1
+
+        update_today(record, morning, afternoon, evening)
+    else:
+        if (record.hour >= 0) & (record.hour <= 10):
+                morning += 1
+        elif (record.hour >= 11) & (record.hour <= 17):
+            afternoon += 1
+        else:
+            evening += 1
+
+        addToday(morning,afternoon,evening)
+
+    df = pd.DataFrame(data=[["morning",morning],["afternoon",afternoon],["evening",evening]],columns=["Time of the day",'Duration'])
+    fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
+    return fig
 
 #if __name__ == '__main__':
 #    app.run_server(debug=True)
