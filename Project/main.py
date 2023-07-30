@@ -7,7 +7,7 @@ from sensors import sensor
 from sensors import gps
 from camera import human_detector
 from math import radians, sin, cos, sqrt, atan2
-import data_analytics
+from data_analytics import run_Dash
 
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
@@ -144,6 +144,7 @@ def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOM
 
 
 #main app
+run_Dash()
 while True:
     if sensor.USE_REAL_SENSOR_DATA:
 
@@ -237,5 +238,5 @@ while True:
 
     pass
 
-run_Dash()
+
 
