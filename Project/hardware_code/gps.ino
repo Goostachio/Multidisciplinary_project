@@ -1,4 +1,9 @@
 #include <TinyGPS++.h>
+/*
+The TinyGPS++ is a library that allows the data to be converted into a more useful and readable format.
+In this case, the only data needed are altitudes and longitudes, so the library is used to simplify and eradicate
+  any unused data, and make the Python code easier to write.
+*/
 #include <SoftwareSerial.h>
 
 // Define the pins for the SoftwareSerial RX (Receive) and TX (Transmit) connections
@@ -39,8 +44,6 @@ void loop(){
       Serial.print(gps.location.lat(), 6);  
       Serial.print(" Longitude= "); 
       Serial.println(gps.location.lng(), 6);
-
-      // The output is going to look something like this: "Latitude= 11.072128 Longitude= 106.580999"
     }
   }
 }
