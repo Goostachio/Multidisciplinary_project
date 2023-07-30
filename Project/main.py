@@ -7,7 +7,7 @@ from sensors import sensor
 from sensors import gps
 from camera import human_detector
 from math import radians, sin, cos, sqrt, atan2
-from data_analytics import app
+from data_analytics import run_Dash
 import threading
 
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
@@ -114,6 +114,7 @@ client.connect()
 client.loop_background()
 
 #main app
+run_Dash()
 def main_application_logic():
         
     on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
