@@ -235,7 +235,6 @@ while True:
 
     time.sleep(10)
 
-
     pass
 
 run_Dash()
