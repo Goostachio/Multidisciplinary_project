@@ -183,13 +183,13 @@ def run_Dash():
     def update_power_used(n_intervals):
         #fetch api from button
         # define API endpoint and key
-        url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-        headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
+        url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+        headers = {"X-AIO-Key": "aio_kvvy88NclwPKoI8q7jZOaCgzBsa8"}
         timeFrame = requests.get(url, headers=headers).json()
 
         #fetch api of humidity
         url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-        headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
+        headers = {"X-AIO-Key": "aio_kvvy88NclwPKoI8q7jZOaCgzBsa8"}
         response = requests.get(url, headers=headers).json()
         humidity = int(float(response['last_value']))
 
@@ -230,7 +230,7 @@ def run_Dash():
     def update_current_pay(power_used):
         # fetch api of humidity
         url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/sensor2"
-        headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
+        headers = {"X-AIO-Key": "aio_kvvy88NclwPKoI8q7jZOaCgzBsa8"}
         response = requests.get(url, headers=headers).json()
         humidity = int(float(response['last_value']))
 
@@ -254,8 +254,8 @@ def run_Dash():
     def update_pie_chart(n_intervals):
         # fetch api from button
         # define API endpoint and key
-        url = "	https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-        headers = {"X-AIO-Key": "aio_zdIq64LiUqWjsdEG0yWBsIJY73hS"}
+        url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+        headers = {"X-AIO-Key": "aio_kvvy88NclwPKoI8q7jZOaCgzBsa8"}
         timeFrame = requests.get(url, headers=headers).json()
         record = changeFormat(timeFrame['created_at'])
 
