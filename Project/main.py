@@ -110,15 +110,12 @@ client.on_connect = connected
 client.on_disconnect = disconnected
 client.on_message = message
 client.on_subscribe = subscribe
-
+client.connect()
+client.loop_background()
 
 #main app
 def main_application_logic():
-
-    if not client.is_connected():
-        client.connect()
-        client.loop_background()
-
+        
     on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
     #on_off_tag = 0  # Mark at which 'ON/OFF AUTOMATION' condition block the code was run from 
 
