@@ -104,18 +104,20 @@ def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOM
 on_off_tag = 0  # Mark at which 'ON/OFF AUTOMATION' condition block the code was run from
 mode_tag = 0  # Mark at which 'MODE AUTOMATION' condition block the code was run from
 
+client = MQTTClient(AIO_USERNAME, AIO_KEY)
+
+client.on_connect = connected
+client.on_disconnect = disconnected
+client.on_message = message
+client.on_subscribe = subscribe
+
 
 #main app
 def main_application_logic():
 
-    client = MQTTClient(AIO_USERNAME, AIO_KEY)
-
-    client.on_connect = connected
-    client.on_disconnect = disconnected
-    client.on_message = message
-    client.on_subscribe = subscribe
-    client.connect()
-    client.loop_background()
+    if not client.is_connected():
+        client.connect()
+        client.loop_background()
 
     on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
     #on_off_tag = 0  # Mark at which 'ON/OFF AUTOMATION' condition block the code was run from 
