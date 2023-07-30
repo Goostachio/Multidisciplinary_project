@@ -268,5 +268,5 @@ def update_pie_chart(n_intervals):
         fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
         return fig
 
-    if __name__ == '__main__':
-        app.run_server(debug=True)
+#if __name__ == '__main__':
+#    app.run_server(debug=True)
