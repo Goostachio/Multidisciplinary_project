@@ -11,14 +11,14 @@ from data_analytics import app
 import threading
 
 
-AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
+AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location","distance"]
 AIO_USERNAME = "Multidisciplinary_Project"
 aio = open("key/aio.txt")
 serial = open("key/aio_serial.txt")
 AIO_KEY = aio.read()+serial.read()
 aio.close()
 serial.close()
-AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
+AIO_IDs = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location","distance"]
 
 
 def connected(this_client):
@@ -177,6 +177,7 @@ def main_application_logic():
         publish_gps_to_adafruit_io(latitude, longitude)
         distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
         print("Distance: ", distance)
+        client.publish("distance", distance) 
 
         time.sleep(2)
 
