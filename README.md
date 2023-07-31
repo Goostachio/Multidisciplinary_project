@@ -39,4 +39,3 @@ A free account on [Adafruit IO](https://io.adafruit.com/) is also required.
 2. Run the main.py file.
 3. Install packages as stated above
 4. visit https://io.adafruit.com/Multidisciplinary_Project/dashboards/ai-iot-dashboard?kiosk=true to view the adafruit dashboard.
-5. Access locad
