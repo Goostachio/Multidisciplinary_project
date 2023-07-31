@@ -28,11 +28,15 @@ Before you proceed, ensure that you have Python version 3.8 or above installed w
 - dash_bootstrap_components
 - dash_bootstrap_template
 - plotly 
+- threading
+- math
 
 A free account on [Adafruit IO](https://io.adafruit.com/) is also required.  
 
 ### Installation
 
-1. Clone the repository.
+1. Clone the repository (the Project folder).
 2. Run the main.py file.
-3. visit https://io.adafruit.com/Multidisciplinary_Project/dashboards/ai-iot-dashboard?kiosk=true to view the adafruit dashboard.
+3. Install packages as stated above
+4. visit https://io.adafruit.com/Multidisciplinary_Project/dashboards/ai-iot-dashboard?kiosk=true to view the adafruit dashboard.
+5. Access locad
