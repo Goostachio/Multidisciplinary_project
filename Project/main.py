@@ -125,7 +125,7 @@ client.connect()
 client.loop_background()
 
 
-# Main app
+# Main app function containing the while true loop explained above
 def main_application_logic():
     # These variables are used in the 'while loop' below. They keep track of the necessary information for
     # the algorithm to run as intended
