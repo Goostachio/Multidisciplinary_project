@@ -10,6 +10,7 @@ from math import radians, sin, cos, sqrt, atan2
 from data_analytics import app
 import threading
 
+
 AIO_FEED_ID = ["sensor1", "sensor2", "sensor3", "button1", "button2", "location"]
 AIO_USERNAME = "Multidisciplinary_Project"
 aio = open("key/aio.txt")
@@ -84,7 +85,20 @@ def request_data(cmd):
     return temp_hum
 
 
-def is_previous_on_off_if_block(this_tag):  # Read explanation in the ON/OFF AUTOMATION LOGIC for better understanding
+on_off_tag = 0  # To shows which 'ON/OFF AUTOMATION LOGIC' condition block the code was run from in the previous loop
+mode_tag = 0  # To shows which 'MODE AUTOMATION LOGIC' condition block the code was run from in the previous loop
+
+# Please check the 'ON/OFF AUTOMATION LOGIC' code block below to have a better understanding of this function
+# The purpose of this function is to check whether the current 'running if block'
+# is the same as the previous one. Each 'if block' is given a specific value, with the 1st
+# 'if block' on_off_tag = 0, 2nd one is 1 and so on. If the current 'if block' is not the
+# same as the previous 'if block', meaning the variable 'on_off_tag' is not the same as the current
+# 'if block' identifier. The 'on_off_tag' is then set to the current 'if block' identifier.
+# For example, in the 1st loop the 'if block' number 1 is true, then 'on_off_tag' is set equal to 0.
+# In the 2nd loop the 'if block' number 2 is true, then 'on_off_tag' is set equal to 1.
+# This on_off_tag affects the behaviour of the variable 'second'. In case the if condition is true,
+# 'second' is reset back to 0. Otherwise, it keeps its current value and incremented by 10.
+def is_previous_on_off_if_block(this_tag):
     global on_off_tag
     global on_off_second
     if this_tag != on_off_tag:
@@ -93,7 +107,7 @@ def is_previous_on_off_if_block(this_tag):  # Read explanation in the ON/OFF AUT
     on_off_second += 10
 
 
-def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOMATION LOGIC for better understanding
+def is_previous_mode_if_block(this_tag):
     global mode_tag
     global mode_second
     if this_tag != mode_tag:
@@ -101,8 +115,7 @@ def is_previous_mode_if_block(this_tag):  # Read explanation in the ON/OFF AUTOM
         mode_second = 0
     mode_second += 10
 
-on_off_tag = 0  # Mark at which 'ON/OFF AUTOMATION' condition block the code was run from
-mode_tag = 0  # Mark at which 'MODE AUTOMATION' condition block the code was run from
+
 
 client = MQTTClient(AIO_USERNAME, AIO_KEY)
 
@@ -113,48 +126,52 @@ client.on_subscribe = subscribe
 client.connect()
 client.loop_background()
 
-#main app
+
+# Main app
 def main_application_logic():
+    # These variables are used in the 'while loop' below. They keep track of the necessary information for
+    # the algorithm to run as intended
+    # See 'ON/OFF AUTOMATION LOGIC' code block for there usage
     on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
-    #on_off_tag = 0  # Mark at which 'ON/OFF AUTOMATION' condition block the code was run from 
+    #on_off_tag = 0  # To shows which 'ON/OFF AUTOMATION LOGIC' condition block the code was run from in the previous loop
 
     mode_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
-    #mode_tag = 0  # Mark at which 'MODE AUTOMATION' condition block the code was run from
+    #mode_tag = 0  # To shows which 'MODE AUTOMATION LOGIC' condition block the code was run from in the previous loop
 
-    trigger_point = 100  # RELATE TO __second variable above (help with maintenance purposes)
+    trigger_point = 100  # This link the on_off_second/mod_second variable. When equal, something will be executed
     is_on = False  # To tell whether the AC is on or off
-   
-    counter = 0  # Use to get the index of the below 2 lists
+
+    index = 0  # Use to get the index of the 'temp_humid_coord_list' list
     temp_humid_coord_file = open("data/temperature_humidity_coordinate.txt", "r")  # Open "temperature_humidity_coordinate.txt"
     temp_humid_coord_list = list(csv.reader(temp_humid_coord_file))  # Create a list (array) from temp_humid_file CSV (easier for me to work with)
     temp_humid_coord_length = len(temp_humid_coord_list)  # Size of array
     temp_humid_coord_file.close()
 
     while True:
+        # In this if else statement, the program check if a port is connected. If 'True',
+        # use data collected from the sensors, if 'False', use data provided in a .txt file
         if sensor.USE_REAL_SENSOR_DATA:
 
             temperature = request_data("0")
             humidity = request_data("1")
-            latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
-                                                    float(temp_humid_coord_list[counter][3]))
+            latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[index][2]),
+                                                    float(temp_humid_coord_list[index][3]))
             time.sleep(1)
         else:
-
-
             # Read value from files
-            temperature = float(temp_humid_coord_list[counter][0].strip())  # The 2nd dimension index has to be 0
-            humidity = float(temp_humid_coord_list[counter][1].strip())  # The 2nd dimension index has to be 1
-            latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[counter][2]),
-                                                    float(temp_humid_coord_list[counter][3]))
-            counter += 1
-            if counter > temp_humid_coord_length:  # Loop back from the beginning when reach the end
-                counter = 0
+            temperature = float(temp_humid_coord_list[index][0].strip())  # The 2nd dimension index has to be 0
+            humidity = float(temp_humid_coord_list[index][1].strip())  # The 2nd dimension index has to be 1
+            latitude, longitude = gps.read_gps_data(float(temp_humid_coord_list[index][2]),
+                                                    float(temp_humid_coord_list[index][3]))
+            index += 1
+            if index > temp_humid_coord_length:  # Loop back from the beginning when reach the end
+                index = 0
 
-            print("Can not open the port. Using simulated data.") # print message
-            print(f'Latitude: {latitude}, Longitude: {longitude}')
+            print("Can not open the port. Using simulated data.")  # print message
+
             time.sleep(1)
 
-        human_detector_result = human_detector.detection()
+        human_detector_result = human_detector.detection().strip()
 
         client.publish("sensor1", temperature)
         client.publish("sensor2", humidity)
@@ -162,20 +179,12 @@ def main_application_logic():
         publish_gps_to_adafruit_io(latitude, longitude)
         distance = calculate_distance(location_to_check[0], location_to_check[1], latitude, longitude)
         print("Distance: ", distance)
-        human_detector_result = human_detector.detection()
 
         time.sleep(2)
 
-        # ON/OFF AUTOMATION LOGIC                          
-        if human_detector_result == "Human presence" and temperature > 28:  # First if block -> tag = 0
-            # If the tag is not equal to 0 (the first if block) set 'tag' to 0 and reset 'second' to 0
-            # This prevents conflict between each if block. For example, if the 1st 'if block' is only
-            # executed half way (second = 200)
-            # And the 4th 'if block' is executed, the code should know to set 'second' back to 0 so that the 4th if block
-            # can be executed correctly (if 'second' is not set to 0 the instruction will be run immediately, which defeats
-            # the 60-second delay logic)
-            # But when a 'if block' is executed consecutively, then 'second' should not be set back to 0
-            # print("If Block 0 true")
+        # ON/OFF AUTOMATION LOGIC
+        # Begin
+        if human_detector_result == "Human presence" and temperature > 28:
             is_previous_on_off_if_block(0)  # First if block -> on_off_tag = 0
 
             if on_off_second > trigger_point/5:
@@ -199,15 +208,17 @@ def main_application_logic():
                 on_off_second = 0
                 is_on = False
 
-        elif distance > 1 and human_detector_result == "Empty" :
-            # print("If Block 3 true")        
+        elif distance > 1 and human_detector_result == "Empty":
+            # print("If Block 3 true")
             is_previous_on_off_if_block(3)  # Fourth if block -> on_off_tag = 3
             if on_off_second > trigger_point/5:
                 client.publish("button1", "0")
                 on_off_second = 0
                 is_on = False
+        # End
 
         # MODE AUTOMATION LOGIC
+        # Begin
         if is_on is True and humidity > 70:
             is_previous_mode_if_block(0)  # First if block -> mode_tag = 0
             if mode_second > trigger_point/5:
@@ -218,10 +229,10 @@ def main_application_logic():
             if mode_second > trigger_point/5:
                 client.publish("button2", "0")
                 mode_second = 0
-
+        # End
         time.sleep(10)
-
+        pass
 main_thread = threading.Thread(target=main_application_logic)
 main_thread.start()
-app.run_server(debug=True)
+app.run_server()#debug=True
 main_thread.join()

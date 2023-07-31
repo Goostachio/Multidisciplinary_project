@@ -67,18 +67,18 @@ def update_today(today, morning, afternoon, evening):
         writer.writerows(time)
         file.close()
 
-
-
-#initiate app
-app = dash.Dash(__name__,external_stylesheets=[dbc.themes.CYBORG])
-load_figure_template('Cyborg')
-
 #used for later
 tick = 0 #live track time in sec
 power_used = 0
 morning = 0  # from 00:00 to 10:59
 afternoon = 0  # from 11:00 to 17:59
 evening = 0  # from 18:00 to 23:59
+
+#initiate app
+app = dash.Dash(__name__,external_stylesheets=[dbc.themes.CYBORG])
+load_figure_template('Cyborg')
+
+
 
 # Layout
 app.layout = html.Div(
@@ -209,7 +209,6 @@ def update_power_used(n_intervals):
         #when end, save payment in a .csv file
         payment = [changeFormat(timeFrame["created_at"]),power_used,acPaymentCalc(power_used)]
 
-        #should be in a seperate func to save in a .csv file but don't work. pls help
         with open("data/pay.csv", 'a') as csvfile:
             # creating a csv writer object
             csvwriter = csv.writer(csvfile)
@@ -224,7 +223,7 @@ def update_power_used(n_intervals):
 
 
     power_used += (tick/3600)*(actualW(humidity)/1000)
-    return html.H2(f"{power_used:.2f} (kWh)") #in kWs
+    return html.H2(f"{power_used:.2f} ")
 
 
 # Callback for current pay this month
@@ -270,7 +269,7 @@ def update_pie_chart(n_intervals):
     global afternoon
     global evening
 
-    data = pd.DataFrame("/data/usage_tracking.csv")
+    data = pd.DataFrame("data/usage_tracking.csv")
 
     if timeFrame['last_value'] == "1": #is turned on
         if record != datetime.today().date(): #the date is not today, means has come to the next day
