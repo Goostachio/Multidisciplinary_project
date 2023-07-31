@@ -115,8 +115,6 @@ def is_previous_mode_if_block(this_tag):
         mode_second = 0
     mode_second += 10
 
-
-
 client = MQTTClient(AIO_USERNAME, AIO_KEY)
 
 client.on_connect = connected

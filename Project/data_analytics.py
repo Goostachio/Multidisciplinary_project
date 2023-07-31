@@ -318,6 +318,3 @@ def update_pie_chart(n_intervals):
     df = pd.DataFrame(data=[["morning",morning],["afternoon",afternoon],["evening",evening]],columns=["Time of the day",'Duration'])
     fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
     return fig
-
-#if __name__ == '__main__':
-#    app.run_server(debug=True)
