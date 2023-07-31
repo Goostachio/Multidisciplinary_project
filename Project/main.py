@@ -131,7 +131,7 @@ def main_application_logic():
     # the algorithm to run as intended
     # See 'ON/OFF AUTOMATION LOGIC' code block for there usage
     on_off_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
-    #on_off_tag = 0  # To shows which 'ON/OFF AUTOMATION LOGIC' condition block the code was run from in the previous loop
+    on_off_tag = 0  # To shows which 'ON/OFF AUTOMATION LOGIC' condition block the code was run from in the previous loop
 
     mode_second = 0  # When a certain value is reached, depends on the situation, the AC functions accordingly
     #mode_tag = 0  # To shows which 'MODE AUTOMATION LOGIC' condition block the code was run from in the previous loop
@@ -196,7 +196,7 @@ def main_application_logic():
             if on_off_second > trigger_point/5:
                 client.publish("button1", "1")
                 on_off_second = 0
-                if_on = True
+                is_on = True
 
         elif temperature < 24:
             # print("If Block 2 true")
@@ -232,5 +232,5 @@ def main_application_logic():
         pass
 main_thread = threading.Thread(target=main_application_logic)
 main_thread.start()
-app.run_server()#debug=True
+app.run_server()#debug=True for debugging but will duplicate the output.
 main_thread.join()

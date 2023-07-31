@@ -43,7 +43,7 @@ def actualW(humidity):  #hudmidity may change ac's power input
 
 def addToday(morning, afternoon, evening):
     tracking = [datetime.today().date(), morning, afternoon, evening]
-    with open("/data/usage_tracking.csv", 'a') as csvfile:
+    with open("data/usage_tracking.csv", 'a') as csvfile:
         # creating a csv writer object
         csvwriter = csv.writer(csvfile)
 
@@ -54,7 +54,7 @@ def addToday(morning, afternoon, evening):
         csvfile.close()
 
 def update_today(today, morning, afternoon, evening):
-    with open("/data/usage_tracking.csv", 'r') as file:
+    with open("data/usage_tracking.csv", 'r') as file:
         reader = csv.reader(file)
         time = list(reader)
 
@@ -260,61 +260,68 @@ def update_current_pay(power_used):
 def update_pie_chart(n_intervals):
     # fetch api from button
     # define API endpoint and key
-    url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
-    headers = {"X-AIO-Key": "aio_QchM14nMBqegxFwR8QCtrCPlMoUE"}
-    timeFrame = requests.get(url, headers=headers).json()
-    record = changeFormat(timeFrame['created_at'])
+    if n_intervals:
+        url = "https://io.adafruit.com/api/v2/Multidisciplinary_Project/feeds/button1"
+        headers = {"X-AIO-Key": AIO_KEY}
+        timeFrame = requests.get(url, headers=headers).json()
+        record = changeFormat(timeFrame['created_at'])
 
-    global morning
-    global afternoon
-    global evening
+        global morning
+        global afternoon
+        global evening
 
-    data = pd.DataFrame("data/usage_tracking.csv")
+        data = pd.read_csv("data/usage_tracking.csv")
 
-    if timeFrame['last_value'] == "1": #is turned on
-        if record != datetime.today().date(): #the date is not today, means has come to the next day
-            if record in data['dates'].unique(): #update value if there is already the same date, or make a new one if it don't
-                if (record.hour >= 0) & (record.hour <= 10):
-                    morning += 1
-                elif (record.hour >= 11) & (record.hour <= 17):
-                    afternoon += 1
+        if timeFrame['last_value'] == "1": #is turned on
+            if record != datetime.today().date(): #the date is not today, means has come to the next day
+                if record in data['date'].unique(): #update value if there is already the same date, or make a new one if it don't
+                    if (record.hour >= 0) & (record.hour <= 10):
+                        morning += 1
+                    elif (record.hour >= 11) & (record.hour <= 17):
+                        afternoon += 1
+                    else:
+                        evening += 1
+
+                    update_today(record,morning,afternoon,evening)
                 else:
-                    evening += 1
+                        # evaluation
+                    if (record.hour >= 0) & (record.hour <= 10):
+                        morning += 1
+                    elif (record.hour >= 11) & (record.hour <= 17):
+                        afternoon += 1
+                    else:
+                        evening += 1
+                    addToday(morning,afternoon,evening)
+        elif record in data['date'].unique():
+            #pull, eval, update
+            morning = data.iloc[-1].morning
+            afternoon = data.iloc[-1].afternoon
+            evening = data.iloc[-1].evening
 
-                update_today(record,morning,afternoon,evening)
-            else:
-                    # evaluation
-                if (record.hour >= 0) & (record.hour <= 10):
-                    morning += 1
-                elif (record.hour >= 11) & (record.hour <= 17):
-                    afternoon += 1
-                else:
-                    evening += 1
-                addToday(morning,afternoon,evening)
-    elif record in data['date'].unique():
-        #pull, eval, update
-        morning = data.iloc[-1].morning
-        afternoon = data.iloc[-1].afternoon
-        evening = data.iloc[-1].evening
-
-        if (record.hour >= 0) & (record.hour <= 10):
-            morning += 1
-        elif (record.hour >= 11) & (record.hour <= 17):
-            afternoon += 1
-        else:
-            evening += 1
-
-        update_today(record, morning, afternoon, evening)
-    else:
-        if (record.hour >= 0) & (record.hour <= 10):
+            if (record.hour >= 0) & (record.hour <= 10):
                 morning += 1
-        elif (record.hour >= 11) & (record.hour <= 17):
-            afternoon += 1
+            elif (record.hour >= 11) & (record.hour <= 17):
+                afternoon += 1
+            else:
+                evening += 1
+
+            update_today(record, morning, afternoon, evening)
         else:
-            evening += 1
+            if (record.hour >= 0) & (record.hour <= 10):
+                    morning += 1
+            elif (record.hour >= 11) & (record.hour <= 17):
+                afternoon += 1
+            else:
+                evening += 1
 
-        addToday(morning,afternoon,evening)
+            addToday(morning,afternoon,evening)
 
-    df = pd.DataFrame(data=[["morning",morning],["afternoon",afternoon],["evening",evening]],columns=["Time of the day",'Duration'])
-    fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
-    return fig
+        df = pd.DataFrame(data=[["morning",morning],["afternoon",afternoon],["evening",evening]],columns=["Time of the day",'Duration'])
+        fig = px.pie(df,values="Duration",names="Time of the day", title="Usage of today")
+        return fig
+    else:
+        df = pd.DataFrame(data=[["morning", 0], ["afternoon", 0], ["evening", 0]],
+                          columns=["Time of the day", 'Duration'])
+        fig = px.pie(df, values="Duration", names="Time of the day", title="Usage of today")
+        return fig
+
