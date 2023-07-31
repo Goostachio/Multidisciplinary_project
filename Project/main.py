@@ -235,10 +235,5 @@ def main_application_logic():
 # Create a thread to run the main_application_logic in the background
 main_thread = threading.Thread(target=main_application_logic)
 main_thread.start()
-
 # Run the web server using Dash to display data analytics (if implemented)
 app.run_server()
-# Note: The 'debug=True' argument is not included here, so debugging will not be enabled.
-
-# Wait for the main_thread to finish (probably won't be reached in this script)
-main_thread.join()
